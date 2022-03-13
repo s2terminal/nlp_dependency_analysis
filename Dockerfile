@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     build-essential \
     libboost-dev \
+    mecab libmecab-dev mecab-ipadic mecab-ipadic-utf8 ipadic \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
@@ -39,6 +40,22 @@ RUN wget https://nlp.ist.i.kyoto-u.ac.jp/nl-resource/knp/${KNP_FILE}.tar.bz2 && 
     make && \
     make install
 
+# CaboCha
+ENV CABOCHA_FILE=cabocha-0.69
+RUN git clone --depth 1 https://github.com/taku910/crfpp.git ./tmp/crfpp && \
+    cd ./tmp/crfpp && \
+    sed -i '/#include "winmain.h"/d' crf_test.cpp && \
+    sed -i '/#include "winmain.h"/d' crf_learn.cpp && \
+    ./configure && \
+    make && \
+    make install && \
+    ldconfig
+ADD ./tmp/${CABOCHA_FILE}.tar.bz2 ./tmp
+RUN cd ./tmp/${CABOCHA_FILE} && \
+    ./configure --with-charset=utf8 --enable-utf8-only && \
+    make && \
+    make install
+
 RUN ldconfig
 
 RUN pip install poetry
@@ -46,3 +63,5 @@ RUN pip install poetry
 COPY pyproject.toml ./
 COPY poetry.lock ./
 RUN poetry install
+
+RUN cd ./tmp/${CABOCHA_FILE}/python && poetry run python setup.py install
