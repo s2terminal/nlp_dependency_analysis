@@ -13,6 +13,8 @@ joblib = "^1.1.0"
 ginza = "^5.1.0"
 ja-ginza = "^5.1.0"
 ja-ginza-electra = "^5.1.0"
+papermill = "^2.3.4"
+Janome = "^0.4.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
